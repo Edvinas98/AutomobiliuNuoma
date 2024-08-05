@@ -7,20 +7,20 @@ using AutomobiliuNuoma.Core.Models;
 
 namespace AutomobiliuNuoma.Core.Contracts
 {
-    public interface IKlientaiRepository
+    public interface IDarbuotojaiRepository
     {
         /// <summary>
         /// Nuskaito klientu sarasa is failo ir ji grazina
         /// </summary>
         /// <returns></returns>
-        List<Klientas> NuskaitytiKlientus();
+        List<Darbuotojas> NuskaitytiDarbuotojus();
         /// <summary>
         /// Iraso klientu sarasa i faila
         /// </summary>
         /// <param name="klientai"></param>
         /// <param name="bTikPrideti">Nurodo, ar reikia prideti duomenis prie failo ar istrinti faile turimus duomenis</param>
-        void IrasytiKlienta(Klientas klientas);
-        void AtnaujintiKlienta(Klientas senasKlientas, Klientas klientas);
-        void IstrintiKlienta(Klientas klientas);
+        void IrasytiDarbuotoja(Darbuotojas darbuotojas);
+        void AtnaujintiDarbuotoja(Darbuotojas senasDarbuotojas, Darbuotojas darbuotojas);
+        void IstrintiDarbuotoja(Darbuotojas darbuotojas);
     }
 }

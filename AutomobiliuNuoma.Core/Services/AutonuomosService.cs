@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutomobiliuNuoma.Core.Contracts;
 using AutomobiliuNuoma.Core.Models;
+using AutomobiliuNuoma.Core.Repositories;
 
 namespace AutomobiliuNuoma.Core.Services
 {
@@ -12,12 +13,17 @@ namespace AutomobiliuNuoma.Core.Services
     {
         private readonly IKlientaiService _klientaiService;
         private readonly IAutomobiliaiService _automobiliaiService;
+        private readonly IDarbuotojaiService _darbuotojaiService;
+        private readonly IUzsakymaiRepository _uzsakymaiRepository;
         private List<NuomosUzsakymas> Uzsakymai = new List<NuomosUzsakymas>();
 
-        public AutonuomosService(IKlientaiService klientaiService, IAutomobiliaiService automobiliaiService)
+        public AutonuomosService(IKlientaiService klientaiService, IAutomobiliaiService automobiliaiService, IDarbuotojaiService darbuotojaiService, IUzsakymaiRepository uzsakymaiRepository)
         {
             _automobiliaiService = automobiliaiService;
             _klientaiService = klientaiService;
+            _darbuotojaiService = darbuotojaiService;
+            _uzsakymaiRepository = uzsakymaiRepository;
+            NuskaitytiIsFailo();
         }
 
         public List<Automobilis> GautiVisusAutomobilius()
@@ -68,15 +74,48 @@ namespace AutomobiliuNuoma.Core.Services
 
         public string IstrintiKlienta(Klientas klientas)
         {
-            foreach(NuomosUzsakymas uzsakymas in Uzsakymai)
+            _klientaiService.IstrintiKlienta(klientas);
+            List<NuomosUzsakymas> uzsakymai = new List<NuomosUzsakymas>();
+            foreach (NuomosUzsakymas uzsakymas in Uzsakymai)
             {
-                if(uzsakymas.NuomosKlientas == klientas)
-                {
-                    IstrintiUzsakyma(uzsakymas);
-                    break;
-                }
+                if (uzsakymas.NuomosKlientas != klientas)
+                    uzsakymai.Add(uzsakymas);
             }
-            return _klientaiService.IstrintiKlienta(klientas);
+            Uzsakymai = uzsakymai;
+            return "Klientas sekmingai istrintas";
+        }
+
+        public List<Darbuotojas> GautiVisusDarbuotojus()
+        {
+            return _darbuotojaiService.GautiVisusDarbuotojus();
+        }
+
+        public List<Darbuotojas> DarbuotojoPaieskaPagalVardaIrPavarde(string vardas, string pavarde)
+        {
+            return _darbuotojaiService.PaieskaPagalVardaPavarde(vardas, pavarde);
+        }
+
+        public string PridetiNaujaDarbuotoja(Darbuotojas darbuotojas)
+        {
+            return _darbuotojaiService.PridetiDarbuotoja(darbuotojas);
+        }
+
+        public string IstrintiDarbuotoja(Darbuotojas darbuotojas)
+        {
+            _darbuotojaiService.IstrintiDarbuotoja(darbuotojas);
+            List<NuomosUzsakymas> uzsakymai = new List<NuomosUzsakymas>();
+            foreach (NuomosUzsakymas uzsakymas in Uzsakymai)
+            {
+                if (uzsakymas.NuomosDarbuotojas != darbuotojas)
+                    uzsakymai.Add(uzsakymas);
+            }
+            Uzsakymai = uzsakymai;
+            return "Darbuotojas sekmingai istrintas";
+        }
+
+        public string AtnaujintiDarbuotoja(Darbuotojas darbuotojas, Darbuotojas naujasDarbuotojas, out bool bPavyko)
+        {
+            return _darbuotojaiService.AtnaujintiDarbuotoja(darbuotojas, naujasDarbuotojas, out bPavyko);
         }
 
         public string PridetiNaujaAutomobili(Automobilis automobilis)
@@ -84,18 +123,46 @@ namespace AutomobiliuNuoma.Core.Services
             return _automobiliaiService.PridetiAutomobili(automobilis);
         }
 
-        public string IstrintiAutomobili(Automobilis automobilis)
+        public string IstrintiAutomobili(Automobilis automobilis, bool bTrintiUzsakymus)
         {
-            foreach (NuomosUzsakymas uzsakymas in Uzsakymai)
+            _automobiliaiService.IstrintiAutomobili(automobilis, bTrintiUzsakymus);
+            if (bTrintiUzsakymus)
             {
-                if (uzsakymas.NuomosAutomobilis == automobilis)
+                List<NuomosUzsakymas> uzsakymai = new List<NuomosUzsakymas>();
+                foreach (NuomosUzsakymas uzsakymas in Uzsakymai)
                 {
-                    IstrintiUzsakyma(uzsakymas);
-                    break;
+                    if (uzsakymas.NuomosAutomobilis != automobilis)
+                        uzsakymai.Add(uzsakymas);
+                }
+                Uzsakymai = uzsakymai;
+            }
+            return "Automobilis sekmingai istrintas";
+        }
+
+        public string AtnaujintiAutomobili(Automobilis automobilis, Automobilis naujasAutomobilis, out bool bPavyko)
+        {
+            string rezultatas = _automobiliaiService.AtnaujintiAutomobili(automobilis, naujasAutomobilis, out bPavyko);
+            if (bPavyko)
+            {
+                foreach (NuomosUzsakymas uzsakymas in Uzsakymai)
+                {
+                    if (uzsakymas.NuomosAutomobilis == automobilis)
+                        uzsakymas.NuomosAutomobilis = naujasAutomobilis;
                 }
             }
+            return rezultatas;
+        }
 
-            return _automobiliaiService.IstrintiAutomobili(automobilis);
+        public string AtnaujintiKlienta(Klientas klientas, Klientas naujasKlientas, out bool bPavyko)
+        {
+            return _klientaiService.AtnaujintiKlienta(klientas, naujasKlientas, out bPavyko);
+        }
+
+        public string AtnaujintiUzsakyma(NuomosUzsakymas uzsakymas, NuomosUzsakymas naujasUzsakymas)
+        {
+            _uzsakymaiRepository.AtnaujintiUzsakyma(uzsakymas, naujasUzsakymas);
+            Uzsakymai[Uzsakymai.IndexOf(uzsakymas)] = naujasUzsakymas;
+            return "Uzsakymo duomenys sekmingai atnaujinti";
         }
 
         public List<NuomosUzsakymas> GautiVisusUzsakymus()
@@ -114,47 +181,50 @@ namespace AutomobiliuNuoma.Core.Services
             return paieskosRezultatai;
         }
 
-        public List<Automobilis> GautiVisusLaisvusAutomobilius()
+        public List<NuomosUzsakymas> GautiUzsakymusPagalDarbuotoja(Darbuotojas darbuotojas)
         {
-            List<Automobilis> laisviAuto = new List<Automobilis>();
-            List <Automobilis> automobiliai = _automobiliaiService.GautiVisusAutomobilius();
-            foreach(Automobilis automobilis in automobiliai)
+            List<NuomosUzsakymas> paieskosRezultatai = new List<NuomosUzsakymas>();
+            foreach (NuomosUzsakymas uzsakymas in Uzsakymai)
             {
-                bool bRastas = false;
-                foreach (NuomosUzsakymas uzsakymas in Uzsakymai)
-                {
-                    if (automobilis == uzsakymas.NuomosAutomobilis)
-                    {
-                        bRastas = true;
-                        break;
-                    }
-                }
-                if (!bRastas)
-                    laisviAuto.Add(automobilis);
+                if (uzsakymas.NuomosDarbuotojas == darbuotojas)
+                    paieskosRezultatai.Add(uzsakymas);
             }
-            return laisviAuto;
+            return paieskosRezultatai;
         }
 
         public NuomosUzsakymas SkaiciuotiBendraNuomosKaina(Automobilis automobilis, int dienuKiekis)
         {
-            return new NuomosUzsakymas(new Klientas("Vardenis", "Pavardenis", DateOnly.Parse("1900-01-01")), automobilis, dienuKiekis);
+            return new NuomosUzsakymas(new Klientas("Vardenis", "Pavardenis", DateOnly.Parse("1900-01-01")),new Darbuotojas("Vardenis", "Pavardenis", 1), automobilis, dienuKiekis);
         }
 
         public string SukurtiUzsakyma(NuomosUzsakymas uzsakymas)
         {
-            foreach (NuomosUzsakymas tempUzsakymas in Uzsakymai)
-            {
-                if (tempUzsakymas.NuomosKlientas == uzsakymas.NuomosKlientas)
-                    return "Sis klientas jau yra issinuomaves viena automobili!";
-            }
             Uzsakymai.Add(uzsakymas);
+            IrasytiIFaila(uzsakymas);
+            _darbuotojaiService.PridetiUzsakymaDarbuotoju(uzsakymas.NuomosDarbuotojas);
             return "Uzsakymas sekmingai sukurtas";
         }
 
         public string IstrintiUzsakyma(NuomosUzsakymas uzsakymas)
         {
+            IstrintiIsFailo(uzsakymas);
             Uzsakymai.Remove(uzsakymas);
             return "Uzsakymas sekmingai istrintas";
+        }
+
+        public void IrasytiIFaila(NuomosUzsakymas uzsakymas)
+        {
+            _uzsakymaiRepository.IrasytiUzsakyma(uzsakymas);
+        }
+
+        public void IstrintiIsFailo(NuomosUzsakymas uzsakymas)
+        {
+            _uzsakymaiRepository.IstrintiUzsakyma(uzsakymas);
+        }
+
+        public void NuskaitytiIsFailo()
+        {
+            Uzsakymai = _uzsakymaiRepository.NuskaitytiUzsakymus(_klientaiService.GautiVisusKlientus(), _darbuotojaiService.GautiVisusDarbuotojus(), _automobiliaiService.GautiVisusAutomobilius());
         }
     }
 }

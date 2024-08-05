@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutomobiliuNuoma.Core.Models;
+using AutomobiliuNuoma.Core.Repositories;
 using AutomobiliuNuoma.Core.Services;
 
 namespace AutomobiliuNuoma.Core.Contracts
@@ -42,7 +43,7 @@ namespace AutomobiliuNuoma.Core.Contracts
         /// </summary>
         /// <param name="automobilis"></param>
         /// <returns></returns>
-        string IstrintiAutomobili(Automobilis automobilis);
+        string IstrintiAutomobili(Automobilis automobilis, bool bTrintiUzsakymus);
         /// <summary>
         /// Grazina visu klientu sarasa
         /// </summary>
@@ -79,16 +80,12 @@ namespace AutomobiliuNuoma.Core.Contracts
         /// <returns></returns>
         List<NuomosUzsakymas> GautiUzsakymusPagalKlienta(Klientas klientas);
         /// <summary>
-        /// Grazina automobiliu, kurie nera isnuomoti, sarasa
-        /// </summary>
-        /// <returns></returns>
-        List<Automobilis> GautiVisusLaisvusAutomobilius();
-        /// <summary>
         /// Grazina dirbtini nuomos uzsakyma pagal nurodyta automobili ir dienu kieki
         /// </summary>
         /// <param name="automobilis"></param>
         /// <param name="dienuKiekis"></param>
         /// <returns></returns>
+        List<NuomosUzsakymas> GautiUzsakymusPagalDarbuotoja(Darbuotojas darbuotojas);
         NuomosUzsakymas SkaiciuotiBendraNuomosKaina(Automobilis automobilis, int dienuKiekis);
         /// <summary>
         /// Prideda nuomos uzsakyma i uzsakymu sarasa
@@ -102,5 +99,16 @@ namespace AutomobiliuNuoma.Core.Contracts
         /// <param name="uzsakymas"></param>
         /// <returns></returns>
         string IstrintiUzsakyma(NuomosUzsakymas uzsakymas);
+        void IrasytiIFaila(NuomosUzsakymas uzsakymas);
+        void IstrintiIsFailo(NuomosUzsakymas uzsakymas);
+        void NuskaitytiIsFailo();
+        string AtnaujintiAutomobili(Automobilis automobilis, Automobilis naujasAutomobilis, out bool bPavyko);
+        string AtnaujintiKlienta(Klientas klientas, Klientas naujasKlientas, out bool bPavyko);
+        string AtnaujintiUzsakyma(NuomosUzsakymas uzsakymas, NuomosUzsakymas naujasUzsakymas);
+        List<Darbuotojas> GautiVisusDarbuotojus();
+        List<Darbuotojas> DarbuotojoPaieskaPagalVardaIrPavarde(string vardas, string pavarde);
+        string PridetiNaujaDarbuotoja(Darbuotojas darbuotojas);
+        string IstrintiDarbuotoja(Darbuotojas darbuotojas);
+        string AtnaujintiDarbuotoja(Darbuotojas darbuotojas, Darbuotojas naujasDarbuotojas, out bool bPavyko);
     }
 }

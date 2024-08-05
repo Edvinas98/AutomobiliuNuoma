@@ -18,7 +18,7 @@ namespace AutomobiliuNuoma.Core.Contracts
         /// </summary>
         /// <param name="automobiliai"></param>
         /// <param name="bTikPrideti">Nurodo, ar reikia prideti duomenis prie failo ar istrinti faile turimus duomenis</param>
-        void IrasytiIFaila(List<Automobilis> automobiliai, bool bTikPrideti);
+        void IrasytiIFaila(Automobilis automobiliai);
         /// <summary>
         /// Prideti automobili i sarasa
         /// </summary>
@@ -30,7 +30,7 @@ namespace AutomobiliuNuoma.Core.Contracts
         /// </summary>
         /// <param name="automobilis"></param>
         /// <returns></returns>
-        string IstrintiAutomobili(Automobilis automobilis);
+        void IstrintiAutomobili(Automobilis automobilis, bool bTrintiUzsakymus);
         /// <summary>
         /// Grazina automobiliu sarasa pagal nurodyta marke
         /// </summary>
@@ -42,5 +42,7 @@ namespace AutomobiliuNuoma.Core.Contracts
         /// </summary>
         /// <returns></returns>
         List<Automobilis> GautiVisusAutomobilius();
+        string AtnaujintiAutomobili(Automobilis automobilis, Automobilis naujasAutomobilis, out bool bPavyko);
+        public void IstrintiIsFailo(Automobilis automobiliai, bool bTrintiUzsakymus);
     }
 }

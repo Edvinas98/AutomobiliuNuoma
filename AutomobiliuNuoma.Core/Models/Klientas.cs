@@ -19,9 +19,16 @@ namespace AutomobiliuNuoma.Core.Models
             GimimoData = gimimoData;
         }
 
+        public Klientas(string vardas, string pavarde, DateTime gimimoData)
+        {
+            Vardas = vardas;
+            Pavarde = pavarde;
+            GimimoData = DateOnly.FromDateTime(gimimoData);
+        }
+
         public override string ToString()
         {
-            return $"{Vardas} {Pavarde}".PadRight(30) + $" Gimimo metai: {GimimoData}";
+            return $"{Vardas} {Pavarde}".PadRight(30) + $" Gimimo data: {GimimoData}";
         }
     }
 }

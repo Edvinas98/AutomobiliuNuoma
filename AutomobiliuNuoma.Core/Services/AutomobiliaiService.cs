@@ -12,22 +12,25 @@ namespace AutomobiliuNuoma.Core.Services
     {
         private readonly IAutomobiliaiRepository _automobiliaiRepository;
         private List<Automobilis> Automobiliai = new List<Automobilis>();
-        private int CurrentID = 0;
 
         public AutomobiliaiService(IAutomobiliaiRepository automobiliaiRepository)
         {
             _automobiliaiRepository = automobiliaiRepository;
             NuskaitytiIsFailo();
-            CurrentID = Automobiliai.Count;
         }
         public List<Automobilis> GautiVisusAutomobilius()
         {
             return Automobiliai;
         }
 
-        public void IrasytiIFaila(List<Automobilis> automobiliai, bool bTikPrideti)
+        public void IrasytiIFaila(Automobilis automobilis)
         {
-            _automobiliaiRepository.IrasytiAutomobilius(automobiliai, bTikPrideti);
+            _automobiliaiRepository.IrasytiAutomobili(automobilis);
+        }
+
+        public void IstrintiIsFailo(Automobilis automobilis, bool bTrintiUzsakymus)
+        {
+            _automobiliaiRepository.IstrintiAutomobili(automobilis, bTrintiUzsakymus);
         }
 
         public void NuskaitytiIsFailo()
@@ -55,17 +58,30 @@ namespace AutomobiliuNuoma.Core.Services
             }
 
             Automobiliai.Add(automobilis);
-            List<Automobilis> automobiliai = new List<Automobilis>();
-            automobiliai.Add(automobilis);
-            IrasytiIFaila(automobiliai, true);
+            IrasytiIFaila(automobilis);
             return "Automobilis sekmingai pridetas";
         }
 
-        public string IstrintiAutomobili(Automobilis automobilis)
+        public void IstrintiAutomobili(Automobilis automobilis, bool bTrintiUzsakymus)
         {
+            IstrintiIsFailo(automobilis, bTrintiUzsakymus);
             Automobiliai.Remove(automobilis);
-            IrasytiIFaila(Automobiliai, false);
-            return "Automobilis sekmingai istrintas";
+        }
+
+        public string AtnaujintiAutomobili(Automobilis automobilis, Automobilis naujasAutomobilis, out bool bPavyko)
+        {
+            foreach (Automobilis auto in Automobiliai)
+            {
+                if (auto != automobilis && auto.ID == naujasAutomobilis.ID)
+                {
+                    bPavyko = false;
+                    return "Automobilis su tokiu valstybiniu numeriu jau yra sarase!";
+                }
+            }
+            bPavyko = true;
+            _automobiliaiRepository.AtnaujintiAutomobili(automobilis, naujasAutomobilis);
+            Automobiliai[Automobiliai.IndexOf(automobilis)] = naujasAutomobilis;
+            return "Automobilio informacija sekmingai atnaujinta";
         }
     }
 }

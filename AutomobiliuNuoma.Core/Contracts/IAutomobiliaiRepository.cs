@@ -19,6 +19,9 @@ namespace AutomobiliuNuoma.Core.Contracts
         /// </summary>
         /// <param name="automobiliai"></param>
         /// <param name="bTikPrideti">Nurodo, ar reikia prideti duomenis prie failo ar istrinti faile turimus duomenis</param>
-        void IrasytiAutomobilius(List<Automobilis> automobiliai, bool bTikPrideti);
+        void IrasytiAutomobili(Automobilis automobiliai);
+
+        void AtnaujintiAutomobili(Automobilis senasAutomobilis, Automobilis automobilis);
+        void IstrintiAutomobili(Automobilis automobilis, bool bTrintiUzsakymus);
     }
 }

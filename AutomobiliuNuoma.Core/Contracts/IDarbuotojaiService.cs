@@ -7,42 +7,43 @@ using AutomobiliuNuoma.Core.Models;
 
 namespace AutomobiliuNuoma.Core.Contracts
 {
-    public interface IKlientaiService
+    public interface IDarbuotojaiService
     {
         /// <summary>
-        /// Nuskaityti klientu sarasa is failo
+        /// Nuskaityti darbuotoju sarasa is failo
         /// </summary>
         void NuskaitytiIsFailo();
         /// <summary>
-        /// Iraso klientu sarasa i faila
+        /// Iraso darbuotoju sarasa i faila
         /// </summary>
         /// <param name="klientai"></param>
         /// <param name="bTikPrideti">Nurodo, ar reikia prideti duomenis prie failo ar istrinti faile turimus duomenis</param>
-        void IrasytiIFaila(Klientas klientas);
+        void IrasytiIFaila(Darbuotojas darbuotojas);
         /// <summary>
         /// Grazina klientu sarasa pagal varda ir pavarde
         /// </summary>
         /// <param name="vardas"></param>
         /// <param name="pavarde"></param>
         /// <returns></returns>
-        List<Klientas> PaieskaPagalVardaPavarde(string vardas, string pavarde);
+        List<Darbuotojas> PaieskaPagalVardaPavarde(string vardas, string pavarde);
         /// <summary>
         /// Grazina visa klientu sarasa
         /// </summary>
         /// <returns></returns>
-        List<Klientas> GautiVisusKlientus();
+        List<Darbuotojas> GautiVisusDarbuotojus();
         /// <summary>
         /// Prideti klienta i sarasa
         /// </summary>
         /// <param name="klientas"></param>
         /// <returns></returns>
-        string PridetiKlienta(Klientas klientas);
+        string PridetiDarbuotoja(Darbuotojas darbuotojas);
         /// <summary>
         /// Istrinti klienta is saraso
         /// </summary>
         /// <param name="klientas"></param>
         /// <returns></returns>
-        void IstrintiKlienta(Klientas klientas);
-        public string AtnaujintiKlienta(Klientas klientas, Klientas naujasKlientas, out bool bPavyko);
+        void IstrintiDarbuotoja(Darbuotojas darbuotojas);
+        string AtnaujintiDarbuotoja(Darbuotojas darbuotojas, Darbuotojas naujasDarbuotojas, out bool bPavyko);
+        void PridetiUzsakymaDarbuotoju(Darbuotojas darbuotojas);
     }
 }
